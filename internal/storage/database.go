@@ -88,35 +88,8 @@ func (d *Database) configing() error {
 	return nil
 }
 
-func (d *Database) GetWordTypes() ([]string, error) {
-	typeSet, err := d.requestAllTablesName()
-	if err != nil {
-		return nil, err
-	}
-	return typeSet.ToSlice(), nil
-}
-
-func (d *Database) checkDb() error {
-	words, err := getWords(&wordsFS)
-	if err != nil {
-		return err
-	}
-	existingTable, err := d.requestAllTablesName()
-	if err != nil {
-		return err
-	}
-	for wordsType, content := range words {
-		if existingTable.Contains(wordsType) {
-			fmt.Printf("table %s already exist exits \n", wordsType)
-		} else {
-			fmt.Printf("table %s not exits \n", wordsType)
-			err := d.createTableWithContent(wordsType, strings.Fields(content))
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+func (d *Database) GetWordTypes() (mapset.Set[string], error) {
+	return d.requestAllTablesName()
 }
 
 func (d *Database) requestAllTablesName() (mapset.Set[string], error) {

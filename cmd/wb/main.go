@@ -12,5 +12,6 @@ func main() {
 	h := handler.New()
 	r := gin.Default()
 	r.GET("/ping", h.Ping)
+	r.GET("/words/:type", h.Words)
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
