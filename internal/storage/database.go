@@ -64,6 +64,30 @@ func New() *Database {
 	return database
 }
 
+func (d *Database) GetWordTypes() (mapset.Set[string], error) {
+	return d.requestAllTablesName()
+}
+
+func (d *Database) GetWords(wordsType string) ([]string, error) {
+	queryString := fmt.Sprintf("SELECT * FROM %s;", wordsType)
+
+	rows, err := d.db.Query(queryString)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var result []string
+	for rows.Next() {
+		var word string
+		err = rows.Scan(&word)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, word)
+	}
+	return result, nil
+}
+
 func (d *Database) configing() error {
 	fmt.Println("check all data...")
 	words, err := getWords(&wordsFS)
@@ -86,10 +110,6 @@ func (d *Database) configing() error {
 		}
 	}
 	return nil
-}
-
-func (d *Database) GetWordTypes() (mapset.Set[string], error) {
-	return d.requestAllTablesName()
 }
 
 func (d *Database) requestAllTablesName() (mapset.Set[string], error) {
@@ -124,12 +144,10 @@ func (d *Database) createTableWithContent(name string, content []string) error {
 		queryString := fmt.Sprintf("INSERT INTO %s (word) VALUES (\"%s\")", name, word)
 		statement, err := d.db.Prepare(queryString)
 		if err != nil {
-			fmt.Printf("error on adding word %s", word)
 			return err
 		}
 		_, err = statement.Exec()
 		if err != nil {
-			fmt.Printf("error on adding word %s", word)
 			return err
 		}
 	}

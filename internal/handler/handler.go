@@ -29,30 +29,41 @@ func (e *Handler) Words(c *gin.Context) {
 	fmt.Println("request " + wordsType)
 	limit := c.Query("limit")
 	if len(limit) > 0 {
-		fmt.Println("limit not empty")
 		_, err := strconv.Atoi(limit)
 		if err != nil {
 			c.String(http.StatusBadRequest, "request format error, param limit should be converted to int")
 			return
-		} else {
-			fmt.Println("limit is" + limit)
 		}
-	} else {
-		fmt.Println("limit is empty")
 	}
 
+	wordsTypes, err := e.db.GetWordTypes()
+	if err != nil {
+		c.String(http.StatusBadRequest, "typer words service not configuring")
+		return
+	}
+
+	if wordsTypes.Contains(wordsType) {
+		words, err := e.db.GetWords(wordsType)
+		if err != nil {
+			c.String(http.StatusOK, "type '%s' not supported", wordsType)
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"words": words,
+			})
+		}
+	} else {
+		c.String(http.StatusBadRequest, "type '%s' not supported", wordsType)
+		return
+	}
+}
+
+func (e *Handler) SupportedTypes(c *gin.Context) {
 	wordsTypes, err := e.db.GetWordTypes()
 	if err != nil {
 		c.String(http.StatusBadRequest, "words service not configuring")
 		return
 	}
-
-	if wordsTypes.Contains(wordsType) {
-		c.String(http.StatusOK, "success request")
-		return
-	} else {
-		c.String(http.StatusOK, "type '%s' not supported", wordsType)
-		return
-	}
-
+	c.JSON(http.StatusOK, gin.H{
+		"types": wordsTypes.ToSlice(),
+	})
 }
