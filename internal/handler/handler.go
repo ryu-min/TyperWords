@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"words_backend/internal/storage"
 
 	"github.com/gin-gonic/gin"
@@ -47,9 +48,8 @@ func (e *Handler) Words(c *gin.Context) {
 		if err != nil {
 			c.String(http.StatusOK, "type '%s' not supported", wordsType)
 		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"words": words,
-			})
+			justString := strings.Join(words, " ")
+			c.String(http.StatusOK, justString)
 		}
 	} else {
 		c.String(http.StatusBadRequest, "type '%s' not supported", wordsType)
