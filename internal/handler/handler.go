@@ -48,8 +48,8 @@ func (e *Handler) Words(c *gin.Context) {
 		if err != nil {
 			c.String(http.StatusOK, "type '%s' not supported", wordsType)
 		} else {
-			justString := strings.Join(words, " ")
-			c.String(http.StatusOK, justString)
+			joinedString := strings.Join(words, " ")
+			c.String(http.StatusOK, joinedString)
 		}
 	} else {
 		c.String(http.StatusBadRequest, "type '%s' not supported", wordsType)
@@ -63,7 +63,6 @@ func (e *Handler) SupportedTypes(c *gin.Context) {
 		c.String(http.StatusBadRequest, "words service not configuring")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"types": wordsTypes.ToSlice(),
-	})
+	joinedString := strings.Join(wordsTypes.ToSlice(), " ")
+	c.String(http.StatusOK, joinedString)
 }
