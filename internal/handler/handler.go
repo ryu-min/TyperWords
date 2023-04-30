@@ -46,10 +46,12 @@ func (e *Handler) Words(c *gin.Context) {
 	if wordsTypes.Contains(wordsType) {
 		words, err := e.db.GetWords(wordsType)
 		if err != nil {
-			c.String(http.StatusOK, "type '%s' not supported", wordsType)
+			c.String(http.StatusBadRequest, "type '%s' not supported", wordsType)
 		} else {
 			joinedString := strings.Join(words, " ")
-			c.String(http.StatusOK, joinedString)
+			c.JSON(http.StatusOK, gin.H{
+				"words": joinedString,
+			})
 		}
 	} else {
 		c.String(http.StatusBadRequest, "type '%s' not supported", wordsType)
@@ -64,5 +66,7 @@ func (e *Handler) SupportedTypes(c *gin.Context) {
 		return
 	}
 	joinedString := strings.Join(wordsTypes.ToSlice(), " ")
-	c.String(http.StatusOK, joinedString)
+	c.JSON(http.StatusOK, gin.H{
+		"types": joinedString,
+	})
 }
