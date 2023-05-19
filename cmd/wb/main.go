@@ -14,5 +14,5 @@ func main() {
 	r.GET("/ping", h.Ping)
 	r.GET("/words/:type", h.Words)
 	r.GET("/supported", h.SupportedTypes)
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.Run("localhost:5050")
 }
